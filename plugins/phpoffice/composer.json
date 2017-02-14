@@ -1,0 +1,13 @@
+{
+    "name": "victor/phpoffice",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Trushin Victor",
+            "email": "v1996-96@mail.ru"
+        }
+    ],
+    "require": {
+        "phpoffice/phpword": "v0.13.*"
+    }
+}

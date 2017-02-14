@@ -1,0 +1,60 @@
+{
+    "4001": {
+        "status": 400,
+        "message": {
+            "en": "Required request parameters are missing",
+            "ru": "Отсутствуют необходимые параметры запроса"
+        }
+    },
+    "4002": {
+        "status": 400,
+        "message": {
+            "en": "File is missing",
+            "ru": "Не передан файл"
+        }
+    },
+    "4003": {
+        "status": 400,
+        "message": {
+            "en": "Unsupported file type",
+            "ru": "Неподдерживаемый тип файла"
+        }
+    },
+    "4004": {
+        "status": 400,
+        "message": {
+            "en": "Maximum of file size was exceeded",
+            "ru": "Максимально допустимый размер файла превышен"
+        }
+    },
+    "4005": {
+        "status": 400,
+        "message": {
+            "en": "Query is too short",
+            "ru": "Запрос слишком короткий"
+        }
+    },
+
+    "4041": {
+        "status": 404,
+        "message": {
+            "en": "File not found",
+            "ru": "Файл не найден"
+        }
+    },
+
+    "5001": {
+        "status": 500,
+        "message": {
+            "en": "Error occured while saving file",
+            "ru": "Ошибка сохранения файла"
+        }
+    },
+    "5002": {
+        "status": 500,
+        "message": {
+            "en": "Error occured while creating new record for file",
+            "ru": "Ошибка добавления файла"
+        }
+    }
+}
