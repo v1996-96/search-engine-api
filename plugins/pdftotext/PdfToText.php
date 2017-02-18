@@ -406,7 +406,7 @@ abstract class  PdfObjectBase		// extends  Object
 	protected function  GetObjectReferences ( $object_id, $object_data, $searched_string, &$object_ids )
 	   {
 		$status		=  true ;
-		$object_ids	=  [] ;
+		$object_ids	=  array() ;
 
 		if  ( preg_match ( "#$searched_string \s+ (?P<object> \d+) \s+ \d+ \s+ R#ix", $object_data, $match ) )
 		   {
@@ -508,11 +508,11 @@ class  PdfToText 	extends PdfObjectBase
 	// Extracted text
 	public		$Text			=  '' ;
 	// Document pages (array of strings)
-	public		$Pages			=  [] ;
+	public		$Pages			=  array() ;
 	// Document images (array of PdfImage objects)
-	public		$Images			=  [] ;
+	public		$Images			=  array() ;
 	// Raw data for document images
-	public		$ImageData		=  [] ;
+	public		$ImageData		=  array() ;
 	// Text chunk separator (used to separate blocks of text specified as an array notation)
 	public		$BlockSeparator		=  '' ;
 	// Separator used to separate text groups where the offset value is less than -1000 thousands of character units
@@ -556,7 +556,7 @@ class  PdfToText 	extends PdfObjectBase
 	// initialization :
 	// %n - Will be replaced with a regex matching a decimal number.
 	private static  $IgnoredInstructionsTemplates	=
-	   [
+	   array(
 		'%n{6} ( (c) | (cm) ) \s+',
 		'%n{4} ( (re) | (y) | (v) ) \s+',
 		'%n{3} ( (scn) | (SCN) | (r) | (rg) | (RG) ) \s+',
@@ -566,28 +566,28 @@ class  PdfToText 	extends PdfObjectBase
 		'\/( (CS \d+) | (GS \d+) | (Fm \d+) | (Im \d+) | (PlacedGraphic) ) \s+ \w+ \s*',
 		//'\s+ [fhnqQSW] [ \t]+',
 		'\/Span \s* << .*? >> [ \t\r\n>]*'
-	    ] ;
+	    ) ;
 	// Replacement regular expressions for %something constructs specified in the $IgnoredInstructions array
 	private static	$ReplacementConstructs	=
-	    [
+	    array(
 		'%n'	=>  '( [+\-]? ( ( [0-9]+ ( \. [0-9]* )? ) | ( \. [0-9]+ ) ) \s+ )'
-	     ] ;
+		 ) ;
 	// The final regexes that are built during static initialization by the __build_ignored_instructions() method
-	private static  $IgnoredInstructions	=  [] ;
+	private static  $IgnoredInstructions	=  array() ;
 
 	// A character map buffer is used to store results from previous calls to the MapCharacter() method of the 
 	// FontTable object. It dramatically reduces the number of calls needed, from one call for each character
 	// defined in the pdf stream, to one call on each DISTINCT character defined in the PDF stream.
 	// As an example, imagine a PDF file that contains 200K characters, but only 150 distinct ones. The
 	// MapCharacter method will be called 150 times, instead of 200 000...
-	private		$CharacterMapBuffer	=  [] ;
+	private		$CharacterMapBuffer	=  array() ;
 
 	// Font information buffer - another cache used by the __next_instruction() method to avoid repeated calls
 	// to the IsMapped() and GetMapWidth() methods
-	private		$FontInformationBuffer	=  [] ;
+	private		$FontInformationBuffer	=  array() ;
 
 	// Map id buffer - for avoiding unneccesar calls to GetFontByMapId
-	private		$MapIdBuffer		=  [] ;
+	private		$MapIdBuffer		=  array() ;
 
 	// Regex used for removing hyphens - we have to take care of different line endings : "\n" for Unix, "\r\n"
 	// for Windows, and "\r" for pure Mac files.
@@ -614,7 +614,7 @@ class  PdfToText 	extends PdfObjectBase
 	const	CTYPE_XNUM		=  0x06 ;		// A synonym for CTYPE_DIGIT | CTYPE_XDIGIT
 
 	private static  $CharacterClass		=  
-	   [
+	   array(
 		'a' => self::CTYPE_XALNUM, 'b' => self::CTYPE_XALNUM, 'c' => self::CTYPE_XALNUM, 'd' => self::CTYPE_XALNUM, 'e' => self::CTYPE_XALNUM, 'f' => self::CTYPE_XALNUM, 
 		'g' => self::CTYPE_ALNUM , 'h' => self::CTYPE_ALNUM , 'i' => self::CTYPE_ALNUM , 'j' => self::CTYPE_ALNUM , 'k' => self::CTYPE_ALNUM , 'l' => self::CTYPE_ALNUM , 
 		'm' => self::CTYPE_ALNUM , 'n' => self::CTYPE_ALNUM , 'o' => self::CTYPE_ALNUM , 'p' => self::CTYPE_ALNUM , 'q' => self::CTYPE_ALNUM , 'r' => self::CTYPE_ALNUM , 
@@ -627,7 +627,7 @@ class  PdfToText 	extends PdfObjectBase
 		'Y' => self::CTYPE_ALNUM , 'Z' => self::CTYPE_ALNUM , 
 		'0' => self::CTYPE_XNUM  , '1' => self::CTYPE_XNUM  , '2' => self::CTYPE_XNUM  , '3' => self::CTYPE_XNUM  , '4' => self::CTYPE_XNUM  , '5' => self::CTYPE_XNUM  , 
 		'6' => self::CTYPE_XNUM  , '7' => self::CTYPE_XNUM  , '8' => self::CTYPE_XNUM  , '9' => self::CTYPE_XNUM
-	    ] ;
+	    ) ;
 
 
 	/*--------------------------------------------------------------------------------------------------------------
@@ -738,11 +738,11 @@ class  PdfToText 	extends PdfObjectBase
 		$this -> Text 			=  '' ;
 		$this -> FontTable 		=  new PdfTexterFontTable ( ) ;
 		$this -> Filename 		=  $filename ;
-		$this -> Pages			=  [] ;
-		$this -> Images			=  [] ;
-		$this -> ImageData		=  [] ;
+		$this -> Pages			=  array() ;
+		$this -> Images			=  array() ;
+		$this -> ImageData		=  array() ;
 		$this -> PageMap		=  new PdfTexterPageMap ( ) ;
-		$this -> PageLocations		=  [] ;
+		$this -> PageLocations		=  array() ;
 		$this -> Author			=  '' ;
 		$this -> CreatorApplication	=  '' ;
 		$this -> ProducerApplication	=  '' ;
@@ -751,9 +751,9 @@ class  PdfToText 	extends PdfObjectBase
 		$this -> GotAuthorInformation	=  false ;
 
 		// Also reset cached information that may come from previous runs
-		$this -> CharacterMapBuffer	=  [] ;
-		$this -> FontInformationBuffer	=  [] ;
-		$this -> MapIdBuffer		=  [] ;
+		$this -> CharacterMapBuffer	=  array() ;
+		$this -> FontInformationBuffer	=  array() ;
+		$this -> MapIdBuffer		=  array() ;
 
 		// Systematically set the GET_IMAGE_DATA flag if DECODE_IMAGE_DATA is specified
 		if  ( $this -> Options  &  self::PDFOPT_DECODE_IMAGE_DATA )
@@ -764,7 +764,7 @@ class  PdfToText 	extends PdfObjectBase
 			return ( false ) ;
 
 		// Character maps encountered so far
-		$cmaps			=  [] ;
+		$cmaps			=  array() ;
 
 		// Objects can be object streams which in turn contains objects (don't know if more than one nesting level could be encountered, however)
 		// It could seem elegant to use recursion to handle that ; however, this method was not designed with recursion in mind, and it would
@@ -772,11 +772,11 @@ class  PdfToText 	extends PdfObjectBase
 		// properties.
 		// The $object_stack array allows us to "flatten" the recursivity and keep track of the series of objects we are currently processing
 		// (objects coming pfrom the pdf file and object streams)
-		$object_stack		=  [] ;
-		array_push ( $object_stack,  [ 'index' => 0, 'matches' => $matches ] ) ;
+		$object_stack		=  array() ;
+		array_push ( $object_stack,  array( 'index' => 0, 'matches' => $matches ) ) ;
 
 		// An array that will store object ids as keys and text contents as values
-		$text			=  [] ;
+		$text			=  array() ;
 
 		while  ( ( $object_stack_count = count ( $object_stack ) )  >  0 )
 		   {
@@ -804,7 +804,7 @@ class  PdfToText 	extends PdfObjectBase
 					$object_stack [ $object_stack_count - 1 ] [ 'index' ]	=  $i + 1 ;
 
 					// Now push the objects coming from the object stream onto the stack
-					array_push ( $object_stack, [ 'index' => 0, 'matches' => $object_stream_matches ] ) ;
+					array_push ( $object_stack, array( 'index' => 0, 'matches' => $object_stream_matches ) ) ;
 
 					// Of course, we need now to process them, before going back to the object list we were currently processing
 					// This is done by executing the next iteration of the outer while() loop
@@ -924,7 +924,7 @@ class  PdfToText 	extends PdfObjectBase
 		$current_font	=  -1 ;
 
 		// Build the page catalog
-		$this -> Pages	=  [] ;
+		$this -> Pages	=  array() ;
 		$this -> PageMap -> MapObjects ( $text ) ;
 
 		// Extract text from the collected text elements
@@ -954,7 +954,7 @@ class  PdfToText 	extends PdfObjectBase
 				$page	=  preg_replace ( self::$RemoveHyphensRegex, '$4$2', $page ) ;
 
 			$length				 =  strlen ( $page ) ;
-			$this -> PageLocations []	 =  [ 'start' => $offset, 'end' => $offset + $length - 1 ] ;
+			$this -> PageLocations []	 =  array( 'start' => $offset, 'end' => $offset + $length - 1 ) ;
 			$offset				+=  $length ;
 		    }
 
@@ -1029,7 +1029,7 @@ class  PdfToText 	extends PdfObjectBase
 		$offset		=  strpos ( $this -> Text, $search, $start ) ;
 
 		if  ( $offset  !==  false )
-			return ( [ $this -> GetPageFromOffset ( $offset ), $offset ] ) ;
+			return ( array( $this -> GetPageFromOffset ( $offset ), $offset ) ) ;
 
 		return ( false ) ;
 	    }
@@ -1040,7 +1040,7 @@ class  PdfToText 	extends PdfObjectBase
 		$offset		=  stripos ( $this -> Text, $search, $start ) ;
 
 		if  ( $offset  !==  false )
-			return ( [ $this -> GetPageFromOffset ( $offset ), $offset ] ) ;
+			return ( array( $this -> GetPageFromOffset ( $offset ), $offset ) ) ;
 
 		return ( false ) ;
 	    }
@@ -1091,7 +1091,7 @@ class  PdfToText 	extends PdfObjectBase
 		if  ( ! $length )
 			return ( false ) ;
 
-		$result		=  [] ;
+		$result		=  array() ;
 		$index		=  0 ;
 
 		while ( ( $index =  strpos ( $this -> Text, $text, $index ) )  !==  false )
@@ -1101,7 +1101,7 @@ class  PdfToText 	extends PdfObjectBase
 			if  ( $group_by_page )
 				$result [ $page ] []	=  $index ;
 			else
-				$result []		=  [ $page, $index ] ;
+				$result []		=  array( $page, $index ) ;
 
 			$index	+=  $length ;
 		    }
@@ -1117,7 +1117,7 @@ class  PdfToText 	extends PdfObjectBase
 		if  ( ! $length )
 			return ( false ) ;
 
-		$result		=  [] ;
+		$result		=  array() ;
 		$index		=  0 ;
 
 		while ( ( $index =  stripos ( $this -> Text, $text, $index ) )  !==  false )
@@ -1127,7 +1127,7 @@ class  PdfToText 	extends PdfObjectBase
 			if  ( $group_by_page )
 				$result [ $page ] []	=  $index ;
 			else
-				$result []		=  [ $page, $index ] ;
+				$result []		=  array( $page, $index ) ;
 
 			$index	+=  $length ;
 		    }
@@ -1255,7 +1255,7 @@ class  PdfToText 	extends PdfObjectBase
 			switch  ( $type )  
 			   {
 				case	self::PDF_DCT_ENCODING :
-					$this -> ImageData	=  [ 'type' => 'jpeg', 'data' => $stream_data ] ;
+					$this -> ImageData	=  array( 'type' => 'jpeg', 'data' => $stream_data ) ;
 					break ;
 			    }
 
@@ -1398,7 +1398,7 @@ class  PdfToText 	extends PdfObjectBase
 	    {
 	    	$output 	=  "" ;
 	    	$is_comment 	=  false ;
-	    	$ords 		=  [] ;
+	    	$ords 		=  array() ;
 
 	    	for  ( $i = 0, $state = 0  ; $i  <  strlen ( $input )  &&  $input [ $i ]  !=  '~'  ; $i ++ )
 	    	   {
@@ -1590,7 +1590,7 @@ class  PdfToText 	extends PdfObjectBase
 		    }
 
 		// Extract every individual object
-		$objects	=  [ 'object_id' => [], 'object' => [] ] ;
+		$objects	=  array( 'object_id' => array(), 'object' => array() ) ;
 
 		for  ( $i = 0, $count = count ( $series ) ; $i  <  $count ; $i += 2 )
 		   {
@@ -1718,10 +1718,10 @@ class  PdfToText 	extends PdfObjectBase
 			$current_font_mapped		=  $this -> FontTable -> IsMapped ( $current_font ) ;
 
 			$this -> FontInformationBuffer [ $current_font ]	=
-			   [
+			   array(
 				'width'		=>  $current_font_map_width,
 				'mapped'	=>  $current_font_mapped
-			    ] ;
+			    ) ;
 		    }
 
 		// Extra newlines to add before the current text
@@ -1803,10 +1803,10 @@ class  PdfToText 	extends PdfObjectBase
 						$current_font_mapped		=  $this -> FontTable -> IsMapped ( $current_font ) ;
 
 						$this -> FontInformationBuffer [ $current_font ]	=
-						   [
+						   array(
 							'width'		=>  $current_font_map_width,
 							'mapped'	=>  $current_font_mapped
-						    ] ;
+						    ) ;
 					    }
 
 			   		break ;
@@ -2071,7 +2071,7 @@ class  PdfToText 	extends PdfObjectBase
 		    }
 
 		// Holds the floating-point values encountered so far
-		$number_stack 	=  [] ;
+		$number_stack 	=  array() ;
 
 		// Loop through the stream of tokens
 		while  ( ( $part = $this -> __next_token ( $data, $data_length, $index ) )  !==  false )
@@ -2088,7 +2088,7 @@ class  PdfToText 	extends PdfObjectBase
 				$x 	=  $number_stack [4] ;
 				$y 	=  $number_stack [5] ;
 
-				return ( [ 'instruction' => 'goto', 'next' => $next_index, 'x' => $x, 'y' => $y, 'relative' => false, 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'goto', 'next' => $next_index, 'x' => $x, 'y' => $y, 'relative' => false, 'token' => $token ) ) ;
 			    }
 			// 'Td' or 'TD' instructions : return a goto instruction with the x and y coordinates (1st and 2nd args)
 			else if  ( $token  ==  'Td'  ||  $token  ==  'TD' )
@@ -2096,38 +2096,38 @@ class  PdfToText 	extends PdfObjectBase
 				$x 	=  $number_stack [0] ;
 				$y 	=  $number_stack [1] ;
 
-				return ( [ 'instruction' => 'goto', 'next' => $next_index, 'x' => $x, 'y' => $y, 'relative' => true, 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'goto', 'next' => $next_index, 'x' => $x, 'y' => $y, 'relative' => true, 'token' => $token ) ) ;
 			    }
 			// Output text "'" instruction, with conditional newline
 			else if  ( $token [0]  ==  "'" )
-				return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => true, 'leading' => false, 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => true, 'leading' => false, 'token' => $token ) ) ;
 			// Same as above
 			else if  ( $token  ==  'TJ'  ||  $token  ==  'Tj' )
-				return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => true, 'leading' => false, 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => true, 'leading' => false, 'token' => $token ) ) ;
 			// Set font size
 			else if  ( $token  ==  'Tf' )
-				return ( [ 'instruction' => 'fontsize', 'next' => $next_index, 'size' => $number_stack [0], 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'fontsize', 'next' => $next_index, 'size' => $number_stack [0], 'token' => $token ) ) ;
 			// Text leading (spacing used by T*)
 			else if  ( $token  ==  'TL' )
-				return ( [ 'instruction' => 'leading', 'next' => $next_index, 'size' => $number_stack [0], 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'leading', 'next' => $next_index, 'size' => $number_stack [0], 'token' => $token ) ) ;
 			// Position to next line
 			else if  ( $token  ==  'T*' )
-				return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => false ] ) ;
+				return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => false ) ) ;
 			// Draw object ("Do"). To prevent different text shapes to appear on the same line, we return a "newline" instruction
 			// here. Note that the shape position is not taken into account here, and shapes will be processed in the order they
 			// appear in the pdf file (which is likely to be different from their position on a graphic screen).
 			else if  ( $token  ==  'Do' )
-				return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => false, 'token' => $token ] ) ;
+				return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => false, 'token' => $token ) ) ;
 			// Raw text output
 			else if  ( $token [0]  ==  '(' )
 			   {
 			   	$next_part 	=  $this -> __next_token ( $data, $data_length, $next_index ) ;
-			   	$instruction	=  [ 'instruction' => 'text', 'next' => $next_index, 'values' => [ $token ], 'token' => $token ] ;
+			   	$instruction	=  array( 'instruction' => 'text', 'next' => $next_index, 'values' => array( $token ), 'token' => $token ) ;
 
 			   	if  ( $next_part [0]  ==  "'" )
 			   	   {
 			   	   	$last_instruction  	=  $instruction ;
-			   	   	return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => true, 'token' => $token ] ) ;
+			   	   	return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => true, 'token' => $token ) ) ;
 			   	   }
 			   	else
 					return ( $instruction ) ;
@@ -2139,12 +2139,12 @@ class  PdfToText 	extends PdfObjectBase
 				if  ( isset ( self::$CharacterClass [ $ch ] )  &&  ( self::$CharacterClass & self::CTYPE_ALNUM ) )
 				   {
 			   		$next_part 	=  $this -> __next_token ( $data, $data_length, $next_index ) ;
-			   		$instruction	=  [ 'instruction' => 'text', 'next' => $next_index, 'values' => [ $token ], 'token' => $token ] ;
+			   		$instruction	=  array( 'instruction' => 'text', 'next' => $next_index, 'values' => array( $token ), 'token' => $token ) ;
 
 			   		if  ( $next_part [0]  ==  "'" )
 			   		   {
 			   	   		$last_instruction  	=  $instruction ;
-			   	   		return ( [ 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => true, 'token' => $token ] ) ;
+			   	   		return ( array( 'instruction' => 'nl', 'next' => $next_index, 'conditional' => false, 'leading' => true, 'token' => $token ) ) ;
 			   		   }
 			   		else
 						return ( $instruction ) ;
@@ -2154,7 +2154,7 @@ class  PdfToText 	extends PdfObjectBase
 			else if  ( $token [0]  ==  '[' )
 			   {
 				$values 	=  $this -> __extract_chars_from_array ( $token ) ;
-				$instruction 	=  [ 'instruction' => 'text', 'next' => $next_index, 'values' => $values [0], 'offsets' => $values [1], 'token' => $token ] ;
+				$instruction 	=  array( 'instruction' => 'text', 'next' => $next_index, 'values' => $values [0], 'offsets' => $values [1], 'token' => $token ) ;
 
 				return ( $instruction ) ;
 			    }
@@ -2176,7 +2176,7 @@ class  PdfToText 	extends PdfObjectBase
 							$this -> MapIdBuffer [ $token ]	=  $id ;
 						    }
 
-						return ( [ 'instruction' => 'resource', 'next' => $next_index, 'resource' => $id, 'token' => $token ] ) ;
+						return ( array( 'instruction' => 'resource', 'next' => $next_index, 'resource' => $id, 'token' => $token ) ) ;
 
 					// Other indirect references : "/Fx", "/fx-y", "/TTx", "/Tx"
 					case	'T' :  case  't' :
@@ -2191,16 +2191,16 @@ class  PdfToText 	extends PdfObjectBase
 							$this -> MapIdBuffer [ $token ]	=  $id ;
 						    }
 
-						return ( [ 'instruction' => 'resource', 'next' => $next_index, 'resource' => $id, 'token' => $token ] ) ;
+						return ( array( 'instruction' => 'resource', 'next' => $next_index, 'resource' => $id, 'token' => $token ) ) ;
 
 					default :
-						$number_stack	=  [] ;
+						$number_stack	=  array() ;
 				    }
 			    }
 			    // Other instructions : we're not that much interested in them, so clear the number stack and consider
 			// that the current parameters, floating-point values, have been processed
 			else
-				$number_stack 	=  [] ;
+				$number_stack 	=  array() ;
 
 			$index 		=  $next_index ;
 		    }
@@ -2283,7 +2283,7 @@ class  PdfToText 	extends PdfObjectBase
 		   			    }
 		   		    }
 
-		   		return ( [ $result, $pos ] ) ;
+		   		return ( array( $result, $pos ) ) ;
 
 			// Parenthesis : Again, we have to find the closing parenthesis, taking care of escape sequences
 			// such as "\)"
@@ -2320,7 +2320,7 @@ class  PdfToText 	extends PdfObjectBase
 		   				$result 	.=  $nch ;
 		   		   }
 
-		   		return ( [ $result, $pos ] ) ;
+		   		return ( array( $result, $pos ) ) ;
 
 			// A construction of the form : "<< something >>", or a unicode character
 		   	case 	'<' :
@@ -2334,7 +2334,7 @@ class  PdfToText 	extends PdfObjectBase
 		   			if  ( $pos  ===  false )
 		   				return ( false ) ;
 
-		   			return ( [ substr ( $data, $index, $pos - $index + 2 ), $pos + 2 ] ) ;
+		   			return ( array( substr ( $data, $index, $pos - $index + 2 ), $pos + 2 ) ) ;
 		   		    }
 		   		else
 		   		   {
@@ -2343,12 +2343,12 @@ class  PdfToText 	extends PdfObjectBase
 		   			if  ( $pos  ===  false )
 		   				return ( false ) ;
 
-		   			return ( [ substr ( $data, $index, $pos - $index + 1 ), $pos + 1 ] ) ;
+		   			return ( array( substr ( $data, $index, $pos - $index + 1 ), $pos + 1 ) ) ;
 		   		   }
 
 			// Tick character : consider it as a keyword, in the same way as the "TJ" or "Tj" keywords
 		   	case 	"'" :
-		   		return ( [ "'", $index + 1 ] ) ;
+		   		return ( array( "'", $index + 1 ) ) ;
 
 			// Other cases : this may be either a floating-point number or a keyword
 		   	default :
@@ -2383,7 +2383,7 @@ class  PdfToText 	extends PdfObjectBase
 		   			    }
 				    }
 
-		   		return ( [ $value, $index ] ) ;
+		   		return ( array( $value, $index ) ) ;
 		    }
 	    }
 
@@ -2401,8 +2401,8 @@ class  PdfToText 	extends PdfObjectBase
 	private function  __extract_chars_from_array ( $array )
 	   {
 		$length 	=  strlen ( $array ) - 1 ;
-		$result 	=  [] ;
-		$offsets	=  [] ; 
+		$result 	=  array() ;
+		$offsets	=  array() ; 
 
 		for  ( $i = 1 ; $i  <  $length ; $i ++ )	// Start with character right after the opening bracket
 		   {
@@ -2448,7 +2448,7 @@ class  PdfToText 	extends PdfObjectBase
 			$result [] 	 =  $char . $endch ;
 		    }
 
-		return ( [ $result, $offsets ] ) ;
+		return ( array( $result, $offsets ) ) ;
 	    }
 
 
@@ -2647,10 +2647,10 @@ class  PdfToText 	extends PdfObjectBase
 class 	PdfTexterFontTable 	extends PdfObjectBase
    {
 	// Font table
-	private		$Fonts		=  [] ;
+	private		$Fonts		=  array() ;
 	private		$DefaultFont	=  false ;
 	// Font mapping between a font number and an object number
-	private 	$FontMap 	=  [] ;
+	private 	$FontMap 	=  array() ;
 
 	// Constructor -
 	//	Well, does not do anything special
@@ -2859,7 +2859,7 @@ class  PdfTexterFont		extends PdfObjectBase
 	// Source : https://msdn.microsoft.com/en-us/goglobal/cc305145.aspx
 	// Only characters from 0x80 to 0x9F has no direct translation
 	protected static	$WinAnsiCharacterMap	=
-	   [
+	   array(
 		0x80	=>  0x20AC,
 		0x82	=>  0x201A,
 		0x83	=>  0x0192,
@@ -2887,11 +2887,11 @@ class  PdfTexterFont		extends PdfObjectBase
 		0x9C	=>  0x0153,
 		0x9E	=>  0x017E,
 		0x9F	=>  0x0178
-	    ] ;
+	    ) ;
 	// Mac roman to Unicode encoding
 	// Source : ftp://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/ROMAN.TXT
 	protected static	$MacRomanCharacterMap	=
-	   [
+	   array(
 		0x80	=>  0x00C4,	# LATIN CAPITAL LETTER A WITH DIAERESIS
 		0x81	=>  0x00C5,	# LATIN CAPITAL LETTER A WITH RING ABOVE
 		0x82	=>  0x00C7,	# LATIN CAPITAL LETTER C WITH CEDILLA
@@ -3020,7 +3020,7 @@ class  PdfTexterFont		extends PdfObjectBase
 		0xFD	=>  0x02DD,	# DOUBLE ACUTE ACCENT
 		0xFE	=>  0x02DB,	# OGONEK
 		0xFF	=>  0x02C7	# CARON
-	    ] ;
+	    ) ;
 	// Font resource id (may be an object id, overridden by <</Rx...>> constructs
 	public		$Id ;
 	// Font type
@@ -3172,12 +3172,12 @@ class  PdfTexterUnicodeMap 	extends 	PdfTexterCharacterMap
 	// file contains so much different characters, unless you are processing the whole Unicode table itself ! - but in this
 	// case, you will simply have to adjust the value of the memory_limit setting in your php.ini file. Consider that I am
 	// not a magician...).
-	protected	$RangeMap		=  [] ;
+	protected	$RangeMap		=  array() ;
 	private		$RangeCount		=  0 ;				// Avoid unnecessary calls to the count() function
-	private		$RangeMin		=  PHP_INT_MAX,			// Min and max values of the character ranges
-			$RangeMax		=  -PHP_INT_MAX ;
+	private		$RangeMin		=  PHP_INT_MAX;			// Min and max values of the character ranges
+	private		$RangeMax		=  PHP_INT_MIN ;
 	// Character substitution table for tables using the beginbfchar notation
-	protected	$DirectMap		=  [] ;
+	protected	$DirectMap		=  array() ;
 
 
 	// Constructor -
@@ -3371,243 +3371,243 @@ class  PdfTexterEncodingMap 	extends  PdfTexterCharacterMap
 	// Correspondance between an encoding name and its corresponding character in the
 	// following format : Standard, Mac, Windows, Pdf
 	private static 		$Encodings 	=
-	   [
-		'A'			=>  [ 0101, 0101, 0101, 0101 ],
-	   	'AE'			=>  [ 0341, 0256, 0306, 0306 ],
-	   	'Aacute'		=>  [    0, 0347, 0301, 0301 ],
-	   	'Acircumflex'		=>  [    0, 0345, 0302, 0302 ],
-		'Adieresis'		=>  [    0, 0200, 0304, 0304 ],
-		'Agrave'		=>  [    0, 0313, 0300, 0300 ],
-		'Aring'			=>  [    0, 0201, 0305, 0305 ],
-		'Atilde'		=>  [    0, 0314, 0303, 0303 ],
-		'B'			=>  [ 0102, 0102, 0102, 0102 ],
-	   	'C' 			=>  [ 0103, 0103, 0103, 0103 ],
-		'Ccedilla'		=>  [    0, 0202, 0307, 0307 ],
-		'D'			=>  [ 0104, 0104, 0104, 0104 ],
-	   	'E' 			=>  [ 0105, 0105, 0105, 0105 ],
-		'Eacute'		=>  [    0, 0203, 0311, 0311 ],
-		'Ecircumflex'		=>  [    0, 0346, 0312, 0312 ],
-		'Edieresis'		=>  [    0, 0350, 0313, 0313 ],
-		'Egrave'		=>  [    0, 0351, 0310, 0310 ],
-		'Eth' 			=>  [    0,    0, 0320, 0320 ],
-		'Euro'			=>  [    0,    0, 0200, 0240 ],
-		'F'			=>  [ 0106, 0106, 0106, 0106 ],
-		'G'			=>  [ 0107, 0107, 0107, 0107 ],
-		'H'			=>  [ 0110, 0110, 0110, 0110 ],
-		'I'			=>  [ 0111, 0111, 0111, 0111 ],
-	   	'Iacute'		=>  [    0, 0352, 0315, 0315 ],
-	   	'Icircumflex'		=>  [    0, 0353, 0316, 0316 ],
-		'Idieresis'		=>  [    0, 0354, 0317, 0317 ],
-		'Igrave'		=>  [    0, 0355, 0314, 0314 ],
-		'J'			=>  [ 0112, 0112, 0112, 0112 ],
-		'K'			=>  [ 0113, 0113, 0113, 0113 ],
-		'L'			=>  [ 0114, 0114, 0114, 0114 ],
-		'Lslash'		=>  [ 0350,    0,    0, 0225 ],
-		'M'			=>  [ 0115, 0115, 0115, 0115 ],
-		'N'			=>  [ 0116, 0116, 0116, 0116 ],
-		'Ntilde'		=>  [    0, 0204, 0321, 0321 ],
-	   	'O'			=>  [ 0117, 0117, 0117, 0117 ],
-		'OE' 			=>  [ 0352, 0316, 0214, 0226 ],
-		'Oacute' 		=>  [    0, 0356, 0323, 0323 ],
-		'Ocircumflex'		=>  [    0, 0357, 0324, 0324 ],
-		'Odieresis'		=>  [    0, 0205, 0326, 0326 ],
-		'Ograve'		=>  [    0, 0361, 0322, 0322 ],
-		'Oslash' 		=>  [ 0351, 0257, 0330, 0330 ],
-		'Otilde' 		=>  [    0, 0315, 0325, 0325 ],
-	   	'P'			=>  [ 0120, 0120, 0120, 0120 ],
-	   	'Q'			=>  [ 0121, 0121, 0121, 0121 ],
-	   	'R'			=>  [ 0122, 0122, 0122, 0122 ],
-	   	'S'			=>  [ 0123, 0123, 0123, 0123 ],
-		'Scaron'		=>  [    0,    0, 0212, 0227 ],
-		'T'			=>  [ 0124, 0124, 0124, 0124 ],
-		'Thorn'			=>  [    0,    0, 0336, 0336 ],
-		'U'			=>  [ 0125, 0125, 0125, 0125 ],
-		'Uacute'		=>  [    0, 0362, 0332, 0332 ],
-		'Ucircumflex'		=>  [    0, 0363, 0333, 0333 ],
-		'Udieresis'		=>  [    0, 0206, 0334, 0334 ],
-		'Ugrave'		=>  [    0, 0364, 0331, 0331 ],
-		'V'			=>  [ 0126, 0126, 0126, 0126 ],
-		'W'			=>  [ 0127, 0127, 0127, 0127 ],
-		'X'			=>  [ 0130, 0130, 0130, 0130 ],
-		'Y'			=>  [ 0131, 0131, 0131, 0131 ],
-		'Yacute'		=>  [    0,    0, 0335, 0335 ],
-		'Ydieresis'		=>  [    0, 0331, 0237, 0230 ],
-		'Z'			=>  [ 0132, 0132, 0132, 0132 ],
-	   	'Zcaron'		=>  [    0,    0, 0216, 0231 ],
-		'a' 			=>  [ 0141, 0141, 0141, 0141 ],
-		'aacute'		=>  [    0, 0207, 0341, 0341 ],
-		'acircumflex'		=>  [    0, 0211, 0342, 0342 ],
-		'acute'			=>  [ 0302, 0253, 0264, 0264 ],
-		'adieresis'		=>  [    0, 0212, 0344, 0344 ],
-		'ae'			=>  [ 0361, 0276, 0346, 0346 ],
-		'agrave' 		=>  [    0, 0210, 0340, 0340 ],
-		'ampersand' 		=>  [ 0046, 0046, 0046, 0046 ],
-		'aring' 		=>  [    0, 0214, 0345, 0345 ],
-		'asciicircum' 		=>  [ 0136, 0136, 0136, 0136 ],
-		'asciitilde'		=>  [ 0176, 0176, 0176, 0176 ],
-		'asterisk' 		=>  [ 0052, 0052, 0052, 0052 ],
-		'at'			=>  [ 0100, 0100, 0100, 0100 ],
-		'atilde'		=>  [    0, 0213, 0343, 0343 ],
-		'b' 			=>  [ 0142, 0142, 0142, 0142 ],
-		'backslash' 		=>  [ 0134, 0134, 0134, 0134 ],
-		'bar' 			=>  [ 0174, 0174, 0174, 0174 ],
-		'braceleft'		=>  [ 0173, 0173, 0173, 0173 ],
-		'braceright' 		=>  [ 0175, 0175, 0175, 0175 ],
-		'bracketleft' 		=>  [ 0133, 0133, 0133, 0133 ],
-		'bracketright' 		=>  [ 0135, 0135, 0135, 0135 ],
-		'breve'			=>  [ 0306, 0371,    0, 0030 ],
-		'brokenbar' 		=>  [    0,    0, 0246, 0246 ],
-		'bullet' 		=>  [ 0267, 0245, 0225, 0200 ],
-		'c'			=>  [ 0143, 0143, 0143, 0143 ],
-		'caron'			=>  [ 0317, 0377,    0, 0031 ],
-		'ccedilla'		=>  [    0, 0215, 0347, 0347 ],
-		'cedilla'		=>  [ 0313, 0374, 0270, 0270 ],
-		'cent' 			=>  [ 0242, 0242, 0242, 0242 ],
-		'circumflex' 		=>  [ 0303, 0366, 0210, 0032 ],
-		'colon' 		=>  [ 0072, 0072, 0072, 0072 ],
-		'comma'			=>  [ 0054, 0054, 0054, 0054 ],
-		'copyright'		=>  [    0, 0251, 0251, 0251 ],
-		'currency'		=>  [ 0250, 0333, 0244, 0244 ],
-		'd'			=>  [ 0144, 0144, 0144, 0144 ],
-		'dagger' 		=>  [ 0262, 0240, 0206, 0201 ],
-		'daggerdbl' 		=>  [ 0263, 0340, 0207, 0202 ],
-		'degree' 		=>  [    0, 0241, 0260, 0260 ],
-		'dieresis'		=>  [ 0310, 0254, 0250, 0250 ],
-		'divide' 		=>  [    0, 0326, 0367, 0367 ],
-		'dollar' 		=>  [ 0044, 0044, 0044, 0044 ],
-		'dotaccent' 		=>  [ 0307, 0372,    0, 0033 ],
-		'dotlessi'		=>  [ 0365, 0365,    0, 0232 ],
-		'e' 			=>  [ 0145, 0145, 0145, 0145 ],
-		'eacute'		=>  [    0, 0216, 0351, 0351 ],
-		'ecircumflex'		=>  [    0, 0220, 0352, 0352 ],
-		'edieresis' 		=>  [    0, 0221, 0353, 0353 ],
-		'egrave'		=>  [    0, 0217, 0350, 0350 ],
-		'eight' 		=>  [ 0070, 0070, 0070, 0070 ],
-		'ellipsis' 		=>  [ 0274, 0311, 0205, 0203 ],
-		'emdash' 		=>  [ 0320, 0321, 0227, 0204 ],
-		'endash' 		=>  [ 0261, 0320, 0226, 0205 ],
-		'equal' 		=>  [ 0075, 0075, 0075, 0075 ],
-		'eth'			=>  [    0,    0, 0360, 0360 ],
-		'exclam' 		=>  [ 0041, 0041, 0041, 0041 ],
-		'exclamdown' 		=>  [ 0241, 0301, 0241, 0241 ],
-		'f' 			=>  [ 0146, 0146, 0146, 0146 ],
-		'fi' 			=>  [ 0256, 0336,    0, 0223 ],
-		'five' 			=>  [ 0065, 0065, 0065, 0065 ],
-		'fl' 			=>  [ 0257, 0337,    0, 0224 ],
-		'florin' 		=>  [ 0246, 0304, 0203, 0206 ],
-		'four'			=>  [ 0064, 0064, 0064, 0064 ],
-		'fraction'		=>  [ 0244, 0332,    0, 0207 ],
-		'g' 			=>  [ 0147, 0147, 0147, 0147 ],
-		'germandbls'		=>  [ 0373, 0247, 0337, 0337 ],
-		'grave' 		=>  [ 0301, 0140, 0140, 0140 ],
-		'greater' 		=>  [ 0076, 0076, 0076, 0076 ],
-		'guillemotleft'		=>  [ 0253, 0307, 0253, 0253 ],
-		'guillemotright' 	=>  [ 0273, 0310, 0273, 0273 ],
-		'guilsinglleft'		=>  [ 0254, 0334, 0213, 0210 ],
-		'guilsinglright'	=>  [ 0255, 0335, 0233, 0211 ],
-		'h'			=>  [ 0150, 0150, 0150, 0150 ],
-		'hungarumlaut'		=>  [ 0315, 0375,    0, 0034 ],
-		'hyphen' 		=>  [ 0055, 0055, 0055, 0055 ],
-		'i' 			=>  [ 0151, 0151, 0151, 0151 ],
-		'iacute'		=>  [    0, 0222, 0355, 0355 ],
-		'icircumflex' 		=>  [    0, 0224, 0356, 0356 ],
-		'idieresis'		=>  [    0, 0225, 0357, 0357 ],
-		'igrave' 		=>  [    0, 0223, 0354, 0354 ],
-		'j' 			=>  [ 0152, 0152, 0152, 0152 ],
-		'k' 			=>  [ 0153, 0153, 0153, 0153 ],
-		'l' 			=>  [ 0154, 0154, 0154, 0154 ],
-		'less'			=>  [ 0074, 0074, 0074, 0074 ],
-		'logicalnot' 		=>  [    0, 0302, 0254, 0254 ],
-		'lslash'		=>  [ 0370,    0,    0, 0233 ],
-		'm'			=>  [ 0155, 0155, 0155, 0155 ],
-		'macron'		=>  [ 0305, 0370, 0257, 0257 ],
-		'minus' 		=>  [    0,    0,    0, 0212 ],
-		'mu' 			=>  [    0, 0265, 0265, 0265 ],
-		'multiply'		=>  [    0,    0, 0327, 0327 ],
-		'n' 			=>  [ 0156, 0156, 0156, 0156 ],
-		'nine' 			=>  [ 0071, 0071, 0071, 0071 ],
-		'ntilde' 		=>  [    0, 0226, 0361, 0361 ],
-		'numbersign' 		=>  [ 0043, 0043, 0043, 0043 ],
-		'o'			=>  [ 0157, 0157, 0157, 0157 ],
-		'oacute' 		=>  [    0, 0227, 0363, 0363 ],
-		'ocircumflex' 		=>  [    0, 0231, 0364, 0364 ],
-		'odieresis'		=>  [    0, 0232, 0366, 0366 ],
-		'oe' 			=>  [ 0372, 0317, 0234, 0234 ],
-		'ogonek' 		=>  [ 0316, 0376,    0, 0035 ],
-		'ograve'		=>  [    0, 0230, 0362, 0362 ],
-		'one' 			=>  [ 0061, 0061, 0061, 0061 ],
-		'onehalf' 		=>  [    0,    0, 0275, 0275 ],
-		'onequarter' 		=>  [    0,    0, 0274, 0274 ],
-		'onesuperior'		=>  [    0,    0, 0271, 0271 ],
-		'ordfeminine' 		=>  [ 0343, 0273, 0252, 0252 ],
-		'ordmasculine' 		=>  [ 0353, 0274, 0272, 0272 ],
-		'oslash'		=>  [ 0371, 0277, 0370, 0370 ],
-		'otilde' 		=>  [    0, 0233, 0365, 0365 ],
-		'p'			=>  [ 0160, 0160, 0160, 0160 ],
-		'paragraph' 		=>  [ 0266, 0246, 0266, 0266 ],
-		'parenleft' 		=>  [ 0050, 0050, 0050, 0050 ],
-		'parenright'		=>  [ 0051, 0051, 0051, 0051 ],
-		'percent' 		=>  [ 0045, 0045, 0045, 0045 ],
-		'period' 		=>  [ 0056, 0056, 0056, 0056 ],
-		'periodcentered'	=>  [ 0264, 0341, 0267, 0267 ],
-		'perthousand' 		=>  [ 0275, 0344, 0211, 0213 ],
-		'plus' 			=>  [ 0053, 0053, 0053, 0053 ],
-		'plusminus' 		=>  [    0, 0261, 0261, 0261 ],
-		'q' 			=>  [ 0161, 0161, 0161, 0161 ],
-		'question' 		=>  [ 0077, 0077, 0077, 0077 ],
-		'questiondown' 		=>  [ 0277, 0300, 0277, 0277 ],
-		'quotedbl' 		=>  [ 0042, 0042, 0042, 0042 ],
-		'quotedblbase' 		=>  [ 0271, 0343, 0204, 0214 ],
-		'quotedblleft'		=>  [ 0252, 0322, 0223, 0215 ],
-		'quotedblright'		=>  [ 0272, 0323, 0224, 0216 ],
-		'quoteleft' 		=>  [ 0140, 0324, 0221, 0217 ],
-		'quoteright'		=>  [ 0047, 0325, 0222, 0220 ],
-		'quotesinglbase'	=>  [ 0270, 0342, 0202, 0221 ],
-		'quotesingle'		=>  [ 0251, 0047, 0047, 0047 ],
-		'r'			=>  [ 0162, 0162, 0162, 0162 ],
-		'registered' 		=>  [    0, 0250, 0256, 0256 ],
-		'ring' 			=>  [ 0312, 0373,    0, 0036 ],
-		's'			=>  [ 0163, 0163, 0163, 0163 ],
-		'scaron'		=>  [    0,    0, 0232, 0235 ],
-		'section'		=>  [ 0247, 0244, 0247, 0247 ],
-		'semicolon' 		=>  [ 0073, 0073, 0073, 0073 ],
-		'seven' 		=>  [ 0067, 0067, 0067, 0067 ],
-		'six' 			=>  [ 0066, 0066, 0066, 0066 ],
-		'slash' 		=>  [ 0057, 0057, 0057, 0057 ],
-		'space' 		=>  [ 0040, 0040, 0040, 0040 ],
-		'sterling'		=>  [ 0243, 0243, 0243, 0243 ],
-		't'			=>  [ 0164, 0164, 0164, 0164 ],
-		'thorn' 		=>  [    0,    0, 0376, 0376 ],
-		'three'			=>  [ 0063, 0063, 0063, 0063 ],
-		'threequarters'		=>  [    0,    0, 0276, 0276 ],
-		'threesuperior' 	=>  [    0,    0, 0263, 0263 ],
-		'tilde'			=>  [ 0304, 0367, 0230, 0037 ],
-		'trademark' 		=>  [    0, 0252, 0231, 0222 ],
-		'two' 			=>  [ 0062, 0062, 0062, 0062 ],
-		'twosuperior'		=>  [    0,    0, 0262, 0262 ],
-		'u' 			=>  [ 0165, 0165, 0165, 0165 ],
-		'uacute'		=>  [    0, 0234, 0372, 0372 ],
-		'ucircumflex' 		=>  [    0, 0236, 0373, 0373 ],
-		'udieresis'		=>  [    0, 0237, 0374, 0374 ],
-		'ugrave' 		=>  [    0, 0235, 0371, 0371 ],
-		'underscore' 		=>  [ 0137, 0137, 0137, 0137 ],
-		'v' 			=>  [ 0166, 0166, 0166, 0166 ],
-		'w' 			=>  [ 0167, 0167, 0167, 0167 ],
-		'x' 			=>  [ 0170, 0170, 0170, 0170 ],
-		'y' 			=>  [ 0171, 0171, 0171, 0171 ],
-		'yacute' 		=>  [    0,    0, 0375, 0375 ],
-		'ydieresis' 		=>  [    0, 0330, 0377, 0377 ],
-		'yen' 			=>  [ 0245, 0264, 0245, 0245 ],
-		'z'			=>  [ 0172, 0172, 0172, 0172 ],
-		'zcaron' 		=>  [    0,    0, 0236, 0236 ],
-		'zero' 			=>  [ 0060, 0060, 0060, 0060 ]
-	   ] ;
+	   array(
+		'A'			=>  array( 0101, 0101, 0101, 0101 ),
+	   	'AE'			=>  array( 0341, 0256, 0306, 0306 ),
+	   	'Aacute'		=>  array(    0, 0347, 0301, 0301 ),
+	   	'Acircumflex'		=>  array(    0, 0345, 0302, 0302 ),
+		'Adieresis'		=>  array(    0, 0200, 0304, 0304 ),
+		'Agrave'		=>  array(    0, 0313, 0300, 0300 ),
+		'Aring'			=>  array(    0, 0201, 0305, 0305 ),
+		'Atilde'		=>  array(    0, 0314, 0303, 0303 ),
+		'B'			=>  array( 0102, 0102, 0102, 0102 ),
+	   	'C' 			=>  array( 0103, 0103, 0103, 0103 ),
+		'Ccedilla'		=>  array(    0, 0202, 0307, 0307 ),
+		'D'			=>  array( 0104, 0104, 0104, 0104 ),
+	   	'E' 			=>  array( 0105, 0105, 0105, 0105 ),
+		'Eacute'		=>  array(    0, 0203, 0311, 0311 ),
+		'Ecircumflex'		=>  array(    0, 0346, 0312, 0312 ),
+		'Edieresis'		=>  array(    0, 0350, 0313, 0313 ),
+		'Egrave'		=>  array(    0, 0351, 0310, 0310 ),
+		'Eth' 			=>  array(    0,    0, 0320, 0320 ),
+		'Euro'			=>  array(    0,    0, 0200, 0240 ),
+		'F'			=>  array( 0106, 0106, 0106, 0106 ),
+		'G'			=>  array( 0107, 0107, 0107, 0107 ),
+		'H'			=>  array( 0110, 0110, 0110, 0110 ),
+		'I'			=>  array( 0111, 0111, 0111, 0111 ),
+	   	'Iacute'		=>  array(    0, 0352, 0315, 0315 ),
+	   	'Icircumflex'		=>  array(    0, 0353, 0316, 0316 ),
+		'Idieresis'		=>  array(    0, 0354, 0317, 0317 ),
+		'Igrave'		=>  array(    0, 0355, 0314, 0314 ),
+		'J'			=>  array( 0112, 0112, 0112, 0112 ),
+		'K'			=>  array( 0113, 0113, 0113, 0113 ),
+		'L'			=>  array( 0114, 0114, 0114, 0114 ),
+		'Lslash'		=>  array( 0350,    0,    0, 0225 ),
+		'M'			=>  array( 0115, 0115, 0115, 0115 ),
+		'N'			=>  array( 0116, 0116, 0116, 0116 ),
+		'Ntilde'		=>  array(    0, 0204, 0321, 0321 ),
+	   	'O'			=>  array( 0117, 0117, 0117, 0117 ),
+		'OE' 			=>  array( 0352, 0316, 0214, 0226 ),
+		'Oacute' 		=>  array(    0, 0356, 0323, 0323 ),
+		'Ocircumflex'		=>  array(    0, 0357, 0324, 0324 ),
+		'Odieresis'		=>  array(    0, 0205, 0326, 0326 ),
+		'Ograve'		=>  array(    0, 0361, 0322, 0322 ),
+		'Oslash' 		=>  array( 0351, 0257, 0330, 0330 ),
+		'Otilde' 		=>  array(    0, 0315, 0325, 0325 ),
+	   	'P'			=>  array( 0120, 0120, 0120, 0120 ),
+	   	'Q'			=>  array( 0121, 0121, 0121, 0121 ),
+	   	'R'			=>  array( 0122, 0122, 0122, 0122 ),
+	   	'S'			=>  array( 0123, 0123, 0123, 0123 ),
+		'Scaron'		=>  array(    0,    0, 0212, 0227 ),
+		'T'			=>  array( 0124, 0124, 0124, 0124 ),
+		'Thorn'			=>  array(    0,    0, 0336, 0336 ),
+		'U'			=>  array( 0125, 0125, 0125, 0125 ),
+		'Uacute'		=>  array(    0, 0362, 0332, 0332 ),
+		'Ucircumflex'		=>  array(    0, 0363, 0333, 0333 ),
+		'Udieresis'		=>  array(    0, 0206, 0334, 0334 ),
+		'Ugrave'		=>  array(    0, 0364, 0331, 0331 ),
+		'V'			=>  array( 0126, 0126, 0126, 0126 ),
+		'W'			=>  array( 0127, 0127, 0127, 0127 ),
+		'X'			=>  array( 0130, 0130, 0130, 0130 ),
+		'Y'			=>  array( 0131, 0131, 0131, 0131 ),
+		'Yacute'		=>  array(    0,    0, 0335, 0335 ),
+		'Ydieresis'		=>  array(    0, 0331, 0237, 0230 ),
+		'Z'			=>  array( 0132, 0132, 0132, 0132 ),
+	   	'Zcaron'		=>  array(    0,    0, 0216, 0231 ),
+		'a' 			=>  array( 0141, 0141, 0141, 0141 ),
+		'aacute'		=>  array(    0, 0207, 0341, 0341 ),
+		'acircumflex'		=>  array(    0, 0211, 0342, 0342 ),
+		'acute'			=>  array( 0302, 0253, 0264, 0264 ),
+		'adieresis'		=>  array(    0, 0212, 0344, 0344 ),
+		'ae'			=>  array( 0361, 0276, 0346, 0346 ),
+		'agrave' 		=>  array(    0, 0210, 0340, 0340 ),
+		'ampersand' 		=>  array( 0046, 0046, 0046, 0046 ),
+		'aring' 		=>  array(    0, 0214, 0345, 0345 ),
+		'asciicircum' 		=>  array( 0136, 0136, 0136, 0136 ),
+		'asciitilde'		=>  array( 0176, 0176, 0176, 0176 ),
+		'asterisk' 		=>  array( 0052, 0052, 0052, 0052 ),
+		'at'			=>  array( 0100, 0100, 0100, 0100 ),
+		'atilde'		=>  array(    0, 0213, 0343, 0343 ),
+		'b' 			=>  array( 0142, 0142, 0142, 0142 ),
+		'backslash' 		=>  array( 0134, 0134, 0134, 0134 ),
+		'bar' 			=>  array( 0174, 0174, 0174, 0174 ),
+		'braceleft'		=>  array( 0173, 0173, 0173, 0173 ),
+		'braceright' 		=>  array( 0175, 0175, 0175, 0175 ),
+		'bracketleft' 		=>  array( 0133, 0133, 0133, 0133 ),
+		'bracketright' 		=>  array( 0135, 0135, 0135, 0135 ),
+		'breve'			=>  array( 0306, 0371,    0, 0030 ),
+		'brokenbar' 		=>  array(    0,    0, 0246, 0246 ),
+		'bullet' 		=>  array( 0267, 0245, 0225, 0200 ),
+		'c'			=>  array( 0143, 0143, 0143, 0143 ),
+		'caron'			=>  array( 0317, 0377,    0, 0031 ),
+		'ccedilla'		=>  array(    0, 0215, 0347, 0347 ),
+		'cedilla'		=>  array( 0313, 0374, 0270, 0270 ),
+		'cent' 			=>  array( 0242, 0242, 0242, 0242 ),
+		'circumflex' 		=>  array( 0303, 0366, 0210, 0032 ),
+		'colon' 		=>  array( 0072, 0072, 0072, 0072 ),
+		'comma'			=>  array( 0054, 0054, 0054, 0054 ),
+		'copyright'		=>  array(    0, 0251, 0251, 0251 ),
+		'currency'		=>  array( 0250, 0333, 0244, 0244 ),
+		'd'			=>  array( 0144, 0144, 0144, 0144 ),
+		'dagger' 		=>  array( 0262, 0240, 0206, 0201 ),
+		'daggerdbl' 		=>  array( 0263, 0340, 0207, 0202 ),
+		'degree' 		=>  array(    0, 0241, 0260, 0260 ),
+		'dieresis'		=>  array( 0310, 0254, 0250, 0250 ),
+		'divide' 		=>  array(    0, 0326, 0367, 0367 ),
+		'dollar' 		=>  array( 0044, 0044, 0044, 0044 ),
+		'dotaccent' 		=>  array( 0307, 0372,    0, 0033 ),
+		'dotlessi'		=>  array( 0365, 0365,    0, 0232 ),
+		'e' 			=>  array( 0145, 0145, 0145, 0145 ),
+		'eacute'		=>  array(    0, 0216, 0351, 0351 ),
+		'ecircumflex'		=>  array(    0, 0220, 0352, 0352 ),
+		'edieresis' 		=>  array(    0, 0221, 0353, 0353 ),
+		'egrave'		=>  array(    0, 0217, 0350, 0350 ),
+		'eight' 		=>  array( 0070, 0070, 0070, 0070 ),
+		'ellipsis' 		=>  array( 0274, 0311, 0205, 0203 ),
+		'emdash' 		=>  array( 0320, 0321, 0227, 0204 ),
+		'endash' 		=>  array( 0261, 0320, 0226, 0205 ),
+		'equal' 		=>  array( 0075, 0075, 0075, 0075 ),
+		'eth'			=>  array(    0,    0, 0360, 0360 ),
+		'exclam' 		=>  array( 0041, 0041, 0041, 0041 ),
+		'exclamdown' 		=>  array( 0241, 0301, 0241, 0241 ),
+		'f' 			=>  array( 0146, 0146, 0146, 0146 ),
+		'fi' 			=>  array( 0256, 0336,    0, 0223 ),
+		'five' 			=>  array( 0065, 0065, 0065, 0065 ),
+		'fl' 			=>  array( 0257, 0337,    0, 0224 ),
+		'florin' 		=>  array( 0246, 0304, 0203, 0206 ),
+		'four'			=>  array( 0064, 0064, 0064, 0064 ),
+		'fraction'		=>  array( 0244, 0332,    0, 0207 ),
+		'g' 			=>  array( 0147, 0147, 0147, 0147 ),
+		'germandbls'		=>  array( 0373, 0247, 0337, 0337 ),
+		'grave' 		=>  array( 0301, 0140, 0140, 0140 ),
+		'greater' 		=>  array( 0076, 0076, 0076, 0076 ),
+		'guillemotleft'		=>  array( 0253, 0307, 0253, 0253 ),
+		'guillemotright' 	=>  array( 0273, 0310, 0273, 0273 ),
+		'guilsinglleft'		=>  array( 0254, 0334, 0213, 0210 ),
+		'guilsinglright'	=>  array( 0255, 0335, 0233, 0211 ),
+		'h'			=>  array( 0150, 0150, 0150, 0150 ),
+		'hungarumlaut'		=>  array( 0315, 0375,    0, 0034 ),
+		'hyphen' 		=>  array( 0055, 0055, 0055, 0055 ),
+		'i' 			=>  array( 0151, 0151, 0151, 0151 ),
+		'iacute'		=>  array(    0, 0222, 0355, 0355 ),
+		'icircumflex' 		=>  array(    0, 0224, 0356, 0356 ),
+		'idieresis'		=>  array(    0, 0225, 0357, 0357 ),
+		'igrave' 		=>  array(    0, 0223, 0354, 0354 ),
+		'j' 			=>  array( 0152, 0152, 0152, 0152 ),
+		'k' 			=>  array( 0153, 0153, 0153, 0153 ),
+		'l' 			=>  array( 0154, 0154, 0154, 0154 ),
+		'less'			=>  array( 0074, 0074, 0074, 0074 ),
+		'logicalnot' 		=>  array(    0, 0302, 0254, 0254 ),
+		'lslash'		=>  array( 0370,    0,    0, 0233 ),
+		'm'			=>  array( 0155, 0155, 0155, 0155 ),
+		'macron'		=>  array( 0305, 0370, 0257, 0257 ),
+		'minus' 		=>  array(    0,    0,    0, 0212 ),
+		'mu' 			=>  array(    0, 0265, 0265, 0265 ),
+		'multiply'		=>  array(    0,    0, 0327, 0327 ),
+		'n' 			=>  array( 0156, 0156, 0156, 0156 ),
+		'nine' 			=>  array( 0071, 0071, 0071, 0071 ),
+		'ntilde' 		=>  array(    0, 0226, 0361, 0361 ),
+		'numbersign' 		=>  array( 0043, 0043, 0043, 0043 ),
+		'o'			=>  array( 0157, 0157, 0157, 0157 ),
+		'oacute' 		=>  array(    0, 0227, 0363, 0363 ),
+		'ocircumflex' 		=>  array(    0, 0231, 0364, 0364 ),
+		'odieresis'		=>  array(    0, 0232, 0366, 0366 ),
+		'oe' 			=>  array( 0372, 0317, 0234, 0234 ),
+		'ogonek' 		=>  array( 0316, 0376,    0, 0035 ),
+		'ograve'		=>  array(    0, 0230, 0362, 0362 ),
+		'one' 			=>  array( 0061, 0061, 0061, 0061 ),
+		'onehalf' 		=>  array(    0,    0, 0275, 0275 ),
+		'onequarter' 		=>  array(    0,    0, 0274, 0274 ),
+		'onesuperior'		=>  array(    0,    0, 0271, 0271 ),
+		'ordfeminine' 		=>  array( 0343, 0273, 0252, 0252 ),
+		'ordmasculine' 		=>  array( 0353, 0274, 0272, 0272 ),
+		'oslash'		=>  array( 0371, 0277, 0370, 0370 ),
+		'otilde' 		=>  array(    0, 0233, 0365, 0365 ),
+		'p'			=>  array( 0160, 0160, 0160, 0160 ),
+		'paragraph' 		=>  array( 0266, 0246, 0266, 0266 ),
+		'parenleft' 		=>  array( 0050, 0050, 0050, 0050 ),
+		'parenright'		=>  array( 0051, 0051, 0051, 0051 ),
+		'percent' 		=>  array( 0045, 0045, 0045, 0045 ),
+		'period' 		=>  array( 0056, 0056, 0056, 0056 ),
+		'periodcentered'	=>  array( 0264, 0341, 0267, 0267 ),
+		'perthousand' 		=>  array( 0275, 0344, 0211, 0213 ),
+		'plus' 			=>  array( 0053, 0053, 0053, 0053 ),
+		'plusminus' 		=>  array(    0, 0261, 0261, 0261 ),
+		'q' 			=>  array( 0161, 0161, 0161, 0161 ),
+		'question' 		=>  array( 0077, 0077, 0077, 0077 ),
+		'questiondown' 		=>  array( 0277, 0300, 0277, 0277 ),
+		'quotedbl' 		=>  array( 0042, 0042, 0042, 0042 ),
+		'quotedblbase' 		=>  array( 0271, 0343, 0204, 0214 ),
+		'quotedblleft'		=>  array( 0252, 0322, 0223, 0215 ),
+		'quotedblright'		=>  array( 0272, 0323, 0224, 0216 ),
+		'quoteleft' 		=>  array( 0140, 0324, 0221, 0217 ),
+		'quoteright'		=>  array( 0047, 0325, 0222, 0220 ),
+		'quotesinglbase'	=>  array( 0270, 0342, 0202, 0221 ),
+		'quotesingle'		=>  array( 0251, 0047, 0047, 0047 ),
+		'r'			=>  array( 0162, 0162, 0162, 0162 ),
+		'registered' 		=>  array(    0, 0250, 0256, 0256 ),
+		'ring' 			=>  array( 0312, 0373,    0, 0036 ),
+		's'			=>  array( 0163, 0163, 0163, 0163 ),
+		'scaron'		=>  array(    0,    0, 0232, 0235 ),
+		'section'		=>  array( 0247, 0244, 0247, 0247 ),
+		'semicolon' 		=>  array( 0073, 0073, 0073, 0073 ),
+		'seven' 		=>  array( 0067, 0067, 0067, 0067 ),
+		'six' 			=>  array( 0066, 0066, 0066, 0066 ),
+		'slash' 		=>  array( 0057, 0057, 0057, 0057 ),
+		'space' 		=>  array( 0040, 0040, 0040, 0040 ),
+		'sterling'		=>  array( 0243, 0243, 0243, 0243 ),
+		't'			=>  array( 0164, 0164, 0164, 0164 ),
+		'thorn' 		=>  array(    0,    0, 0376, 0376 ),
+		'three'			=>  array( 0063, 0063, 0063, 0063 ),
+		'threequarters'		=>  array(    0,    0, 0276, 0276 ),
+		'threesuperior' 	=>  array(    0,    0, 0263, 0263 ),
+		'tilde'			=>  array( 0304, 0367, 0230, 0037 ),
+		'trademark' 		=>  array(    0, 0252, 0231, 0222 ),
+		'two' 			=>  array( 0062, 0062, 0062, 0062 ),
+		'twosuperior'		=>  array(    0,    0, 0262, 0262 ),
+		'u' 			=>  array( 0165, 0165, 0165, 0165 ),
+		'uacute'		=>  array(    0, 0234, 0372, 0372 ),
+		'ucircumflex' 		=>  array(    0, 0236, 0373, 0373 ),
+		'udieresis'		=>  array(    0, 0237, 0374, 0374 ),
+		'ugrave' 		=>  array(    0, 0235, 0371, 0371 ),
+		'underscore' 		=>  array( 0137, 0137, 0137, 0137 ),
+		'v' 			=>  array( 0166, 0166, 0166, 0166 ),
+		'w' 			=>  array( 0167, 0167, 0167, 0167 ),
+		'x' 			=>  array( 0170, 0170, 0170, 0170 ),
+		'y' 			=>  array( 0171, 0171, 0171, 0171 ),
+		'yacute' 		=>  array(    0,    0, 0375, 0375 ),
+		'ydieresis' 		=>  array(    0, 0330, 0377, 0377 ),
+		'yen' 			=>  array( 0245, 0264, 0245, 0245 ),
+		'z'			=>  array( 0172, 0172, 0172, 0172 ),
+		'zcaron' 		=>  array(    0,    0, 0236, 0236 ),
+		'zero' 			=>  array(0060, 0060, 0060, 0060 )
+	   ) ;
 
 
 	// Encoding type (one of the PDF_*_ENCODING constants)
 	public 		$Encoding ;
 	// Differences array (a character substitution table to the standard encodings)
-	protected 	$Map 		=  [] ;
+	protected 	$Map 		=  array() ;
 
 
    	// Constructor -
@@ -3758,16 +3758,16 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 	// Page contents are (normally) first described by a catalog
 	// Although there should be only one entry for that, this property is defined as an array, as you need to really
 	// become paranoid when handling pdf contents...
-	protected	$PageCatalogs		=  [] ;
+	protected	$PageCatalogs		=  array() ;
 	// Entries that describe which page contains which text objects. Of course, these can be nested otherwise it would not be funny !
-	protected	$PageKids		=  [] ;
+	protected	$PageKids		=  array() ;
 	// Terminal entries : they directly give the ids of the objects belonging to a page
-	protected	$PageContents		=  [] ;
+	protected	$PageContents		=  array() ;
 	// Note that all the above arrays are indexed by object id and filled with the data collected by calling the Peek() Method...
 
 	// Once the Peek() method has collected page contents & object information, the MapCatalog() method is called to create this array
 	// which contains page numbers as keys, and the list of objects contained in this page as values
-	public		$Pages			=  [] ;
+	public		$Pages			=  array() ;
 
 
 	/*--------------------------------------------------------------------------------------------------------------
@@ -3821,12 +3821,12 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  ( integer ) $match [ 'parent' ] : false ;
 
 				$this -> PageKids [ $object_id ]	=  
-				   [
+				   array(
 					'object'	=>  $object_id,
 					'parent'	=>  $parent,
 					'count'		=>  $page_count,
 					'kids'		=>  $references 
-				    ] ;
+				    ) ;
 			    }
 		    }
 		// Object listing the other objects that are contained in this page (/Type/Page and /Contents[x1 0 R ... xn 0 R]
@@ -3838,11 +3838,11 @@ class  PdfTexterPageMap		extends  PdfObjectBase
 				$parent					=  ( isset ( $match [ 'parent' ] ) ) ?  (integer) $match [ 'parent' ] : false ;
 
 				$this -> PageContents [ $object_id ]	=
-				   [
+				   array(
 					'object'	=>  $object_id,
 					'parent'	=>  $parent,
 					'contents'	=>  $references
-				    ] ;
+				    ) ;
 			    }
 		    }
 	    }

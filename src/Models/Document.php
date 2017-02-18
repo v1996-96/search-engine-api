@@ -34,8 +34,8 @@ class Document {
         $this->db->begin();
         $this->db->exec('INSERT INTO Documents (title, description, url, ext, create_time, indexed) 
                          VALUES (:title, :description, :url, :ext, :create_time, :indexed)', 
-                         ["title" => $title, "description" => $desc, "url" => $url, "ext" => $ext,
-                          "create_time" => date("Y-m-d H:i:s"), "indexed" => 0 ]);
+                         array("title" => $title, "description" => $desc, "url" => $url, "ext" => $ext,
+                          "create_time" => date("Y-m-d H:i:s"), "indexed" => 0 ));
         $id = $this->db->exec('SELECT LAST_INSERT_ID() as id');
         $this->db->commit();
 
@@ -44,12 +44,12 @@ class Document {
 
     public function insertToken($word, $doc_id) {
         return $this->db->exec('CALL insert_token(:word, :id)', 
-                                [ "word" => $word, "id" => (int)$doc_id ]);
+                                array( "word" => $word, "id" => (int)$doc_id ));
     }
 
     public function setIndexed($id, $indexed) {
         return $this->db->exec('UPDATE Documents SET indexed = :indexed WHERE id = :id',
-                                [ "id" => (int)$id, "indexed" => (int)(bool)$indexed ]);
+                                array( "id" => (int)$id, "indexed" => (int)(bool)$indexed ));
     }
 
 }

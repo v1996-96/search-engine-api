@@ -12,10 +12,10 @@ class Query {
 
     public function searchByVector($queryText, $queryTokens, $queryTokensCount) {
         return $this->db->exec("CALL search_by_vector(:queryText, :queryTokens, :queryTokensCount)", 
-                                [
+                                array(
                                     "queryText" => $queryText,
                                     "queryTokens" => $queryTokens,
                                     "queryTokensCount" => $queryTokensCount
-                                ]);
+                                ));
     }
 }

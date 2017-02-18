@@ -9,13 +9,14 @@ final class TextProcessor extends \Prefab {
 
     private $morphy = null;
     private $minWordLength = 3;
+    private $maxWordLength = 150;
     private $sanitizingReg = '[^а-я\s]+';
 
     public $output = null;
 
     function __construct() {
         $this->morphy = new \phpMorphy(self::DICTIONARIES_DIR, self::LANG, [
-            'storage' => PHPMORPHY_STORAGE_FILE,
+            'storage' => PHPMORPHY_STORAGE_MEM,
             'predict_by_suffix' => true, 
             'predict_by_db' => true,
             'graminfo_as_text' => true
@@ -24,11 +25,11 @@ final class TextProcessor extends \Prefab {
 
     public function run($fileContents) {
         if (is_null($fileContents)) {
-            $this->output = [];
+            $this->output = array();
             return;
         }
 
-        $encoder = \CharacterEncoder\EncoderFactory::create(['utf-8', 'cp1251']);        
+        $encoder = \CharacterEncoder\EncoderFactory::create(array('utf-8', 'cp1251'));        
         $encoding = $encoder->detectString(substr($fileContents, 0, 200));
         unset($encoder);
 
@@ -37,12 +38,16 @@ final class TextProcessor extends \Prefab {
 
         $fileContents = mb_convert_encoding($fileContents, 'UTF-8', $encoding);
         $sanitized = mb_eregi_replace($this->sanitizingReg, '', $fileContents); unset($fileContents);
+        $sanitized = str_replace(PHP_EOL, ' ', $sanitized);
         $words = explode(' ', $sanitized); unset($sanitized);
 
-        $wordList = [];
+        $wordList = array();
         foreach ($words as $word) {
-            $trimmed = mb_ereg_replace("(^\s+)|(\s+$)/us", "", $word);
-            if ($trimmed !== "" && mb_strlen($trimmed) > $this->minWordLength) {
+            $trimmed = mb_eregi_replace("[^а-я]", "", $word);
+            $trimmed = mb_eregi_replace("[Ёё]+", "е", $trimmed);
+            if ($trimmed !== "" && 
+                mb_strlen($trimmed) > $this->minWordLength &&
+                mb_strlen($trimmed) < $this->maxWordLength) {
                 array_push($wordList, mb_strtoupper($trimmed)); 
             }
         }
@@ -50,12 +55,12 @@ final class TextProcessor extends \Prefab {
 
         $computed = $this->morphy->getBaseForm($wordList);
 
-        $this->output = [];
+        $this->output = array();
         foreach ($wordList as $word) {
             if (!isset($computed[$word])) continue;
             $found = $computed[$word];
             if (is_array($found) && count($found) >= 1)
-                array_push($this->output, $found[0]);
+                array_push($this->output, mb_eregi_replace("[^а-я]", "", $found[0]));
         }
         unset($wordList);
         unset($computed);
@@ -66,7 +71,7 @@ final class TextProcessor extends \Prefab {
     }
 
     public function getGroupedResult() {
-        $grouped = [];
+        $grouped = array();
         foreach ($this->output as $word) {
             if (isset($grouped[$word])) {
                 $grouped[$word]++;

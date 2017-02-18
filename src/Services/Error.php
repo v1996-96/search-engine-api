@@ -17,36 +17,36 @@ final class Error extends \Prefab {
         }
     }
 
-    public function throw($errcode, $finalize = true) {
+    public function throwError($errcode, $finalize = true) {
         if (!is_null($this->errorList) &&
             !is_array($errcode) &&
             isset($this->errorList[ $errcode ]) &&
             isset($this->errorList[ $errcode ]["message"][ $this->lang ])) {
 
-            $data = [
+            $data = array(
                 "errcode" => $errcode,
                 "status" => $this->errorList[ $errcode ]["status"],
                 "message" => $this->errorList[ $errcode ]["message"][ $this->lang ]
-            ];
+            );
             $code = $this->errorList[ $errcode ]["status"];
         } elseif(is_array($errcode) &&
                  isset($errcode["errcode"]) &&
                  isset($errcode["status"]) &&
                  isset($errcode["message"])) {
                     
-            $data = [
+            $data = array(
                 "errcode" => $errcode["errcode"],
                 "status" => $errcode["status"],
                 "message" => $errcode["message"]
-            ];
+            );
             $code = $errcode["status"];
         } else {
 
-            $data = [
+            $data = array(
                 "errcode" => $errcode,
                 "status" => 500,
                 "message" => "Unknown exception"
-            ];
+            );
             $code = 500;
         }
 

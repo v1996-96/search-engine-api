@@ -10,15 +10,15 @@ class Search extends BaseController {
 
     public function get() {
         if (!isset($_GET['query']))
-            $this->error->throw(4001);
+            $this->error->throwError(4001);
 
         if (strlen($_GET['query']) < 3)
-            $this->error->throw(4005);
+            $this->error->throwError(4005);
 
         $processor = \Services\TextProcessor::instance();
         $processor->run($_GET['query']);
 
-        $queryTokens = [];
+        $queryTokens = array();
         foreach ($processor->getGroupedResult() as $word => $count) {
             $queryTokens[] = $count . "_" . $word;
         }
@@ -27,12 +27,12 @@ class Search extends BaseController {
             $model = new \Models\Query($this->db);
             $response = $model->searchByVector($_GET['query'], implode("||", $queryTokens), count($queryTokens));
         } else {
-            $response = [];
+            $response = array();
         }
 
-        $this->response->send([
+        $this->response->send(array(
             "list" => $response
-        ]);
+        ));
     }
 
 }

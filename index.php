@@ -2,14 +2,13 @@
 
 $f3 = require('lib/base.php');
 require_once('plugins/phpmorphy/src/common.php');
-require_once('plugins/pdftotext/PdfToText.php');
-// require_once('plugins/phpoffice/vendor/autoload.php');
+// require_once('plugins/pdftotext/PdfToText.php');
 
 // System configuration
 $f3->config(".env");
 $f3->set("AUTOLOAD", "src/; plugins/");
-$f3->set("DEBUG", 0);
-$f3->set("CORS.origin", "*");
+$f3->set("DEBUG", 3);
+// $f3->set("CORS.origin", "*");
 
 // Initializing error service
 $lang = $f3->exists('LANG') ? $f3->get('LANG') : "en";
@@ -17,7 +16,7 @@ $lang = $f3->exists('LANG') ? $f3->get('LANG') : "en";
 
 // Wrap all system errors with error service
 $f3->set("ONERROR", function ($data) {
-    \Services\Error::instance()->throw([
+    \Services\Error::instance()->throwError([
         "errcode" => 0,
         "status" => $data["ERROR"]["code"],
         "message" => $data["ERROR"]["text"]

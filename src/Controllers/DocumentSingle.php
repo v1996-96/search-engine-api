@@ -10,14 +10,14 @@ class DocumentSingle extends BaseController {
 
     public function post() {
         if (!$this->f3->exists('PARAMS.id'))
-            $this->error->throw(4041);
+            $this->error->throwError(4041);
 
         $id = (int)$this->f3->get('PARAMS.id');
         $model = new \Models\Document($this->db);
         $document = $model->get($id);
 
         if ($document === false || is_null($document))
-            $this->error->throw(4041);
+            $this->error->throwError(4041);
 
         set_time_limit(0);
 
@@ -34,10 +34,10 @@ class DocumentSingle extends BaseController {
         // Updating indexed status
         $model->setIndexed($id, true);
 
-        $this->response->send([
+        $this->response->send(array(
             "success" => 1, 
             "id" => (int)$id 
-        ]);
+        ));
     }
 
 }
